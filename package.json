@@ -1,0 +1,11 @@
+{
+  "name": "FreeScroll",
+  "verison": "0.0.1",
+  "private": false,
+  "dependencies": {},
+  "devDependencies": {
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.0.1",
+    "gulp": "^3.8.10"
+  }
+}
