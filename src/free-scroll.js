@@ -32,9 +32,6 @@
       return push.apply(this, slice.call(document.querySelectorAll(selector)));
     }
 
-    if (typeof selector === 'function') {
-      return FreeScroll(document).ready(selector);
-    }
   };
 
 

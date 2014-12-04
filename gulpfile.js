@@ -2,7 +2,8 @@
 
 var gulp = require('gulp'),
 rename = require('gulp-rename'),
-uglify = require('gulp-uglify');
+uglify = require('gulp-uglify'),
+karma = require('karma').server;
 
 var DEST = 'build/';
 
@@ -14,4 +15,11 @@ gulp.task('default', function() {
     .pipe(uglify())
     .pipe(rename({ extname: '.min.js' }))
     .pipe(gulp.dest(DEST));
+});
+
+gulp.task('test', function (done) {
+  karma.start({
+    configFile: __dirname + '/tests/karma.conf.js',
+    singleRun: true
+  }, done);
 });
