@@ -42,16 +42,28 @@
 
     },
 
-    on: function(event){
+    on: function(eventId, fn){
+      if(!eventsCache[eventId]){
+        eventsCache[eventId] = [fn];
+      }else{
+        eventsCache[eventId].push(fn);
+      }
+    },
+
+    off: function(eventId){
 
     },
 
-    off: function(event){
+    _fire: function(eventId){
+      var args = [].slice.call(arguments, 1);
 
-    },
+      if(!eventsCache[eventId]){
+        eventsCache[eventId] = [];
+      }
 
-    _fire: function(){
-
+      for (var i = 0, il = eventsCache[eventId].length; i < il; i++) {
+        eventsCache[eventId][i].apply(null, args);
+      };
     }
 
   };
