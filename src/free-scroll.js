@@ -8,7 +8,7 @@
     forEach = [].forEach,
     eventsCache = {};
 
-  function FreeScroll(selector, callback) {
+  function FreeScroll(selector) {
 
     if (!(this instanceof FreeScroll)) {
       return new FreeScroll(selector);
@@ -29,11 +29,31 @@
     }
 
     if (typeof selector === 'string') {
-      return push.apply(this, slice.call(document.querySelectorAll(selector)));
+      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
+      addEvent(this[0], 'scroll', function(){
+        console.log('scroll me');
+      });
+      return arrayResult;
     }
 
   };
 
+  function addEvent( obj, type, fn ) {
+    if ( obj.attachEvent ) {
+      obj['e'+type+fn] = fn;
+      obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
+      obj.attachEvent( 'on'+type, obj[type+fn] );
+    } else
+      obj.addEventListener( type, fn, false );
+  }
+
+  function removeEvent( obj, type, fn ) {
+    if ( obj.detachEvent ) {
+      obj.detachEvent( 'on'+type, obj[type+fn] );
+      obj[type+fn] = null;
+    } else
+      obj.removeEventListener( type, fn, false );
+  }
 
   FreeScroll.prototype = {
     length: 0,
@@ -64,7 +84,7 @@
       for (var i = 0, il = eventsCache[eventId].length; i < il; i++) {
         eventsCache[eventId][i].apply(null, args);
       };
-    }
+    },
 
   };
 
