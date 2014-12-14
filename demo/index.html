@@ -15,9 +15,16 @@
 	<div id="ScrollContainer">
 		div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> 
 	</div>
+	<div id="abc">
+	</div>
 	<script type="text/javascript">
 	//free scroll library free
-	FS('#ScrollContainer');
+	
+	var fs = FS('#ScrollContainer');
+	fs.on('toInfinity', function (el) {
+		el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
+	});
+	FS._fire('toInfinity', document.getElementById('abc'));
 	</script>
 </body>
 </html>

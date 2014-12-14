@@ -31,7 +31,8 @@
     if (typeof selector === 'string') {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
       addEvent(this[0], 'scroll', function(){
-        console.log('scroll me');
+        if(FreeScroll._noMore(this))
+          FreeScroll._fire('toInfinity', this);
       });
       return arrayResult;
     }
@@ -58,10 +59,6 @@
   FreeScroll.prototype = {
     length: 0,
 
-    toInfinity : function(){
-
-    },
-
     on: function(eventId, fn){
       if(!eventsCache[eventId]){
         eventsCache[eventId] = [fn];
@@ -74,19 +71,24 @@
 
     },
 
-    _fire: function(eventId){
-      var args = [].slice.call(arguments, 1);
-
-      if(!eventsCache[eventId]){
-        eventsCache[eventId] = [];
-      }
-
-      for (var i = 0, il = eventsCache[eventId].length; i < il; i++) {
-        eventsCache[eventId][i].apply(null, args);
-      };
-    },
-
   };
+
+  FreeScroll._fire = function(eventId){
+    var args = [].slice.call(arguments, 1);
+
+    if(!eventsCache[eventId]){
+      eventsCache[eventId] = [];
+    }
+
+    for (var i = 0, il = eventsCache[eventId].length; i < il; i++) {
+      eventsCache[eventId][i].apply(null, args);
+    };
+  };
+
+  FreeScroll._noMore = function(el){
+
+    return el.scrollHeight - el.scrollTop === el.clientHeight;
+  }
 
   FreeScroll.fn = FreeScroll.prototype;
 
