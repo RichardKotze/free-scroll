@@ -1,3 +1,4 @@
+'use strict';
 
 (function (window) {
   var document = window.document,
@@ -30,7 +31,7 @@
 
     if (typeof selector === 'string') {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
-      addEvent(this[0], 'scroll', function(){
+      this._addEvent('scroll', function(){
         if(FreeScroll._noMore(this))
           FreeScroll._fire('toInfinity', this);
       });
@@ -86,9 +87,20 @@
   };
 
   FreeScroll._noMore = function(el){
-
     return el.scrollHeight - el.scrollTop === el.clientHeight;
-  }
+  };
+
+  FreeScroll.prototype._addEvent = function(type, fn ) {
+    var _self = this;
+    if(_self instanceof FreeScroll){
+      if ( _self.attachEvent ) {
+        _self['e'+type+fn] = fn;
+        _self[type+fn] = function(){_self['e'+type+fn]( window.event );}
+        _self.attachEvent( 'on'+type, _self[type+fn] );
+      } else
+        _self.addEventListener( type, fn, false );
+    }
+  };
 
   FreeScroll.fn = FreeScroll.prototype;
 
