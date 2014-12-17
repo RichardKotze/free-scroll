@@ -6,7 +6,8 @@
     push = [].push,
     slice = [].slice,
     splice = [].splice,
-    eventsCache = {};
+    eventsCache = {},
+    _fs = null;
 
   function isFreeScroll(obj){
     return obj instanceof FreeScroll;
@@ -15,7 +16,8 @@
   function FreeScroll(selector) {
 
     if (!isFreeScroll(this)) {
-      return new FreeScroll(selector);
+      _fs = new FreeScroll(selector);
+      return _fs;
     }
 
     if (!selector) {
@@ -35,7 +37,7 @@
     if (typeof selector === 'string') {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
       this.addEvent('scroll', function(){
-        if(FreeScroll._noMore(this))
+        if(FreeScroll._noMore(this, 60))
           FreeScroll._fire('toInfinity', this);
       });
       return arrayResult;
@@ -59,31 +61,24 @@
     },
 
     addEvent: function(type, fn) {
-      var _self = this;
-      if(isFreeScroll(_self)){
-        _self.forEach(function(index, el){
-          if (el.attachEvent) {
-            el['e'+type+fn] = fn;
-            el[type+fn] = function(){el['e'+type+fn](window.event);}
-            el.attachEvent('on'+type, el[type+fn]);
-          } else
-            el.addEventListener(type, fn, false);
-        });
-      }
+      this.forEach(function(index, el){
+        if (el.attachEvent) {
+          el['e'+type+fn] = fn;
+          el[type+fn] = function(){el['e'+type+fn](window.event);}
+          el.attachEvent('on'+type, el[type+fn]);
+        } else
+          el.addEventListener(type, fn, false);
+      });
     },
 
     removeEvent: function(type, fn) {
-      var _self = this;
-      if(isFreeScroll(_self)){
-        _self.forEach(function(index, el){
-           if (el.detachEvent) {
-            el.detachEvent('on'+type, el[type+fn]);
-            el[type+fn] = null;
-          } else
-            el.removeEventListener(type, fn, false);
-        });
-      }
-     
+      this.forEach(function(index, el){
+         if (el.detachEvent) {
+          el.detachEvent('on'+type, el[type+fn]);
+          el[type+fn] = null;
+        } else
+          el.removeEventListener(type, fn, false);
+      });
     },
 
     forEach: function(callback) {
@@ -107,8 +102,8 @@
     };
   };
 
-  FreeScroll._noMore = function(el){
-    return el.scrollHeight - el.scrollTop === el.clientHeight;
+  FreeScroll._noMore = function(el, startFrom){
+    return el.scrollHeight - (el.scrollTop + startFrom) <= el.clientHeight;
   };
 
   FreeScroll.fn = FreeScroll.prototype;
