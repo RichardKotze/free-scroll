@@ -3,8 +3,12 @@
 	<title>Free Scroll Demos</title>
 	<script type="text/javascript" src="../src/free-scroll.js"></script>
 	<style type="text/css">
-		#ScrollContainer{
-			height: 300px;
+		.freeScrollContainers {
+			float: left;
+			margin-right: 10px;
+		}
+		#ScrollContainer, #abc {
+			height: 200px;
 			width: 300px;
 			border:1px solid #000;
 			overflow: auto;
@@ -12,17 +16,23 @@
 	</style>
 </head>
 <body>
-	<div id="ScrollContainer">
+	<div id="ScrollContainer" class="freeScrollContainers">
 		div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> div<br/> 
 	</div>
-	<div id="abc">
+	<div id="abc" class="freeScrollContainers">
+		abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> abc <br/> 
 	</div>
 	<script type="text/javascript">
 	//free scroll library free
 	
-	var fs = FS('#ScrollContainer');
-	fs.on('toInfinity', function (el) {
+	var fs1 = FS('#ScrollContainer');
+	fs1.on('toInfinity', function (el) {
 		el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
+	});
+
+	var fs2 = FS({selector:'#abc', distance: 100});
+	fs2.on('toInfinity', function(el) {
+		el.innerHTML += 'abc <br/> abc <br/> abc <br/> abc <br/> abc <br/>';
 	});
 	</script>
 </body>

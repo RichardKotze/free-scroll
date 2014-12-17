@@ -7,17 +7,27 @@
     slice = [].slice,
     splice = [].splice,
     eventsCache = {},
-    _fs = null;
+    defaults = {
+      selector: null,
+      distance: 100,
+      requestDataUrl: null,
+      templateUrl: null
+    };
 
   function isFreeScroll(obj){
     return obj instanceof FreeScroll;
   }
 
+  function forEach(arr, fn){
+    for (var i = 0; i < arr.length; i++) {
+      fn(i, arr[i]);
+    };
+  }
+
   function FreeScroll(selector) {
 
     if (!isFreeScroll(this)) {
-      _fs = new FreeScroll(selector);
-      return _fs;
+      return new FreeScroll(selector);
     }
 
     if (!selector) {
@@ -34,10 +44,12 @@
       return this;
     }
 
-    if (typeof selector === 'string') {
-      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
+    var options = FreeScroll._updateOptions(defaults, selector);
+
+    if (options.selector) {
+      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(options.selector)));
       this.addEvent('scroll', function(){
-        if(FreeScroll._noMore(this, 60))
+        if(FreeScroll._noMore(this, options.distance))
           FreeScroll._fire('toInfinity', this);
       });
       return arrayResult;
@@ -81,11 +93,9 @@
       });
     },
 
-    forEach: function(callback) {
+    forEach: function(fn) {
       var _self = this;
-      for (var i = 0; i < _self.length; i++) {
-        callback(i, _self[i]);
-      };
+      forEach(_self, fn);
     }
 
   };
@@ -106,10 +116,23 @@
     return el.scrollHeight - (el.scrollTop + startFrom) <= el.clientHeight;
   };
 
+  FreeScroll._updateOptions = function(defaultOptions, userOptions){
+    if(typeof userOptions === 'object'){
+      for(var prop in defaultOptions){
+        if(userOptions.hasOwnProperty(prop) && defaultOptions[prop] !== userOptions[prop]){
+          defaultOptions[prop] = userOptions[prop];
+        }
+      }
+    }else if(typeof userOptions === 'string'){
+      defaultOptions.selector = userOptions;
+    }
+
+    return defaultOptions;
+  };
+
   FreeScroll.fn = FreeScroll.prototype;
 
   FreeScroll.prototype.splice = splice;
 
-  // expose to global object
   window.FreeScroll = window.FS = FreeScroll;
 }(window));
