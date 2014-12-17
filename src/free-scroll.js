@@ -6,12 +6,15 @@
     push = [].push,
     slice = [].slice,
     splice = [].splice,
-    forEach = [].forEach,
     eventsCache = {};
+
+  function isFreeScroll(obj){
+    return obj instanceof FreeScroll;
+  }
 
   function FreeScroll(selector) {
 
-    if (!(this instanceof FreeScroll)) {
+    if (!isFreeScroll(this)) {
       return new FreeScroll(selector);
     }
 
@@ -19,7 +22,7 @@
       return this;
     }
 
-    if (selector instanceof FreeScroll) {
+    if (isFreeScroll(selector)) {
       return selector;
     }
 
@@ -31,7 +34,7 @@
 
     if (typeof selector === 'string') {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(selector)));
-      this._addEvent('scroll', function(){
+      this.addEvent('scroll', function(){
         if(FreeScroll._noMore(this))
           FreeScroll._fire('toInfinity', this);
       });
@@ -39,23 +42,6 @@
     }
 
   };
-
-  function addEvent( obj, type, fn ) {
-    if ( obj.attachEvent ) {
-      obj['e'+type+fn] = fn;
-      obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
-      obj.attachEvent( 'on'+type, obj[type+fn] );
-    } else
-      obj.addEventListener( type, fn, false );
-  }
-
-  function removeEvent( obj, type, fn ) {
-    if ( obj.detachEvent ) {
-      obj.detachEvent( 'on'+type, obj[type+fn] );
-      obj[type+fn] = null;
-    } else
-      obj.removeEventListener( type, fn, false );
-  }
 
   FreeScroll.prototype = {
     length: 0,
@@ -71,6 +57,41 @@
     off: function(eventId){
 
     },
+
+    addEvent: function(type, fn) {
+      var _self = this;
+      if(isFreeScroll(_self)){
+        _self.forEach(function(index, el){
+          if (el.attachEvent) {
+            el['e'+type+fn] = fn;
+            el[type+fn] = function(){el['e'+type+fn](window.event);}
+            el.attachEvent('on'+type, el[type+fn]);
+          } else
+            el.addEventListener(type, fn, false);
+        });
+      }
+    },
+
+    removeEvent: function(type, fn) {
+      var _self = this;
+      if(isFreeScroll(_self)){
+        _self.forEach(function(index, el){
+           if (el.detachEvent) {
+            el.detachEvent('on'+type, el[type+fn]);
+            el[type+fn] = null;
+          } else
+            el.removeEventListener(type, fn, false);
+        });
+      }
+     
+    },
+
+    forEach: function(callback) {
+      var _self = this;
+      for (var i = 0; i < _self.length; i++) {
+        callback(i, _self[i]);
+      };
+    }
 
   };
 
@@ -88,18 +109,6 @@
 
   FreeScroll._noMore = function(el){
     return el.scrollHeight - el.scrollTop === el.clientHeight;
-  };
-
-  FreeScroll.prototype._addEvent = function(type, fn ) {
-    var _self = this;
-    if(_self instanceof FreeScroll){
-      if ( _self.attachEvent ) {
-        _self['e'+type+fn] = fn;
-        _self[type+fn] = function(){_self['e'+type+fn]( window.event );}
-        _self.attachEvent( 'on'+type, _self[type+fn] );
-      } else
-        _self.addEventListener( type, fn, false );
-    }
   };
 
   FreeScroll.fn = FreeScroll.prototype;
