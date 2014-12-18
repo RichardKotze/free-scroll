@@ -44,13 +44,14 @@
       return this;
     }
 
-    var options = FreeScroll._updateOptions(defaults, selector);
+    this.options = FreeScroll._updateOptions(defaults, selector);
 
-    if (options.selector) {
-      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(options.selector)));
-      this.addEvent('scroll', function(){
-        if(FreeScroll._noMore(this, options.distance))
-          FreeScroll._fire('toInfinity', this);
+    if (this.options.selector) {
+      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
+      self = this;
+      self.addEvent('scroll', function(){
+        if(FreeScroll._noMore(this, self.options.distance))
+          FreeScroll._fire('toInfinity', self, this);
       });
       return arrayResult;
     }
@@ -58,13 +59,13 @@
   };
 
   FreeScroll.prototype = {
-    length: 0,
+    options: {},
 
     on: function(eventId, fn){
-      if(!eventsCache[eventId]){
-        eventsCache[eventId] = [fn];
+      if(!eventsCache[FreeScroll._genEventId(this.options.selector, eventId)]){
+        eventsCache[FreeScroll._genEventId(this.options.selector, eventId)] = [fn];
       }else{
-        eventsCache[eventId].push(fn);
+        eventsCache[FreeScroll._genEventId(this.options.selector, eventId)].push(fn);
       }
     },
 
@@ -73,7 +74,7 @@
     },
 
     addEvent: function(type, fn) {
-      this.forEach(function(index, el){
+      this.each(function(index, el){
         if (el.attachEvent) {
           el['e'+type+fn] = fn;
           el[type+fn] = function(){el['e'+type+fn](window.event);}
@@ -84,7 +85,7 @@
     },
 
     removeEvent: function(type, fn) {
-      this.forEach(function(index, el){
+      this.each(function(index, el){
          if (el.detachEvent) {
           el.detachEvent('on'+type, el[type+fn]);
           el[type+fn] = null;
@@ -93,22 +94,22 @@
       });
     },
 
-    forEach: function(fn) {
-      var _self = this;
-      forEach(_self, fn);
+    each: function(fn) {
+      var self = this;
+      forEach(self, fn);
     }
 
   };
 
-  FreeScroll._fire = function(eventId){
-    var args = [].slice.call(arguments, 1);
+  FreeScroll._fire = function(eventId, self){
+    var args = [].slice.call(arguments, 2);
 
-    if(!eventsCache[eventId]){
-      eventsCache[eventId] = [];
+    if(!eventsCache[FreeScroll._genEventId(self.options.selector, eventId)]){
+      eventsCache[FreeScroll._genEventId(self.options.selector, eventId)] = [];
     }
 
-    for (var i = 0, il = eventsCache[eventId].length; i < il; i++) {
-      eventsCache[eventId][i].apply(null, args);
+    for (var i = 0, il = eventsCache[FreeScroll._genEventId(self.options.selector, eventId)].length; i < il; i++) {
+      eventsCache[FreeScroll._genEventId(self.options.selector, eventId)][i].apply(null, args);
     };
   };
 
@@ -116,18 +117,26 @@
     return el.scrollHeight - (el.scrollTop + startFrom) <= el.clientHeight;
   };
 
+  FreeScroll._genEventId = function(objectId, eventId){
+    return objectId+'_'+eventId;
+  };
+
   FreeScroll._updateOptions = function(defaultOptions, userOptions){
+    var options = {};
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
         if(userOptions.hasOwnProperty(prop) && defaultOptions[prop] !== userOptions[prop]){
-          defaultOptions[prop] = userOptions[prop];
+          options[prop] = userOptions[prop];
+        }else{
+          options[prop] = defaultOptions[prop];
         }
       }
     }else if(typeof userOptions === 'string'){
-      defaultOptions.selector = userOptions;
+      options = defaultOptions;
+      options.selector = userOptions;
     }
 
-    return defaultOptions;
+    return options;
   };
 
   FreeScroll.fn = FreeScroll.prototype;
