@@ -38,12 +38,6 @@
       return selector;
     }
 
-    if (selector.nodeType) {
-      this[0] = selector;
-      this.length = 1;
-      return this;
-    }
-
     this.options = FreeScroll._updateOptions(defaults, selector);
 
     if (this.options.selector) {
