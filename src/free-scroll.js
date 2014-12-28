@@ -1,6 +1,5 @@
-'use strict';
-
 (function (window) {
+  'use strict';
   var document = window.document,
     // helper methods
     push = [].push,
@@ -21,7 +20,7 @@
   function forEach(arr, fn){
     for (var i = 0; i < arr.length; i++) {
       fn(i, arr[i]);
-    };
+    }
   }
 
   function FreeScroll(selector) {
@@ -44,13 +43,18 @@
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
       self = this;
       self.addEvent('scroll', function(){
-        if(FreeScroll._noMore(this, self.options.distance))
-          FreeScroll._fire('toInfinity', self, this);
+        if(FreeScroll._noMore(this, self.options.distance)){
+          var requestedResult;
+          if(self.options.requestDataUrl !== null){
+            requestedResult = FreeScroll.xhr(self.options.requestDataUrl);
+          }
+          FreeScroll._fire('toInfinity', self, this, requestedResult);
+        }
       });
       return arrayResult;
     }
 
-  };
+  }
 
   FreeScroll.prototype = {
     options: {},
@@ -71,7 +75,9 @@
       this.each(function(index, el){
         if (el.attachEvent) {
           el['e'+type+fn] = fn;
-          el[type+fn] = function(){el['e'+type+fn](window.event);}
+          el[type+fn] = function(){
+            el['e'+type+fn](window.event);
+          };
           el.attachEvent('on'+type, el[type+fn]);
         } else
           el.addEventListener(type, fn, false);
@@ -104,7 +110,7 @@
 
     for (var i = 0, il = eventsCache[FreeScroll._genEventId(self.options.selector, eventId)].length; i < il; i++) {
       eventsCache[FreeScroll._genEventId(self.options.selector, eventId)][i].apply(null, args);
-    };
+    }
   };
 
   FreeScroll._noMore = function(el, startFrom){
