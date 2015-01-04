@@ -5,15 +5,25 @@ var port = 4012;
 
 app.use(express.static(__dirname));
 
-var listing = [
-	{title: 'Book A', description: 'Book A description'},
-	{title: 'Book B', description: 'Book B description'},
-	{title: 'Book C', description: 'Book C description'},
-	{title: 'Book D', description: 'Book D description'},
-];
+var result = {
+	yourArrayName: [
+		{title: 'Book A', description: 'Book A description'},
+		{title: 'Book B', description: 'Book B description'},
+		{title: 'Book C', description: 'Book C description'},
+		{title: 'Book D', description: 'Book D description'},
+	],
+	pageNumber: 1
+};
 
-app.get('/api/listing', function(req, res) {
-  res.json(listing);
+app.get('/api/listing/', function(req, res) {
+	var pageNumber = req.query.page_number || 0;
+	if(pageNumber <= 2){
+		result.pageNumber = pageNumber;
+		res.json(result);
+	}else{
+		res.statusCode = 404;
+    	res.send('Error 404: No listing found');
+	}
 });
 
 app.listen(process.env.PORT || port);

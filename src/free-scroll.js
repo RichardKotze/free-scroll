@@ -9,19 +9,26 @@
     defaults = {
       selector: null,
       distance: 100,
-      requestDataUrl: null,
+      requestData: {
+        urlFormat: null,
+        pageNumber: 1,
+        pageSize: 10
+      },
       templateUrl: null
     };
+  var EVENT_TO_INFINITY = 'toInfinity';
 
-  function isFreeScroll(obj){
+  var isFreeScroll = function(obj){
     return obj instanceof FreeScroll;
-  }
+  };
 
-  function forEach(arr, fn){
+  var forEach = function(arr, fn){
     for (var i = 0; i < arr.length; i++) {
       fn(i, arr[i]);
     }
-  }
+  };
+
+  var infinity = function(){};
 
   function FreeScroll(selector) {
 
@@ -42,15 +49,19 @@
     if (this.options.selector) {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
       self = this;
-      self.addEvent('scroll', function(){
+      infinity = function(){
         if(FreeScroll._noMore(this, self.options.distance)){
-          var requestedResult;
-          if(self.options.requestDataUrl !== null){
-            requestedResult = FreeScroll.xhr(self.options.requestDataUrl);
+          var request;
+          if(self.options.requestData.urlFormat !== null && !self.finished){
+            request = FreeScroll.xhr(self.options.requestData);
+            request.error(function(error){
+              self.finish(error);
+            });
           }
-          FreeScroll._fire('toInfinity', self, this, requestedResult);
+          FreeScroll._fire(EVENT_TO_INFINITY, self, this, request);
         }
-      });
+      };
+      self.addEvent('scroll', infinity);
       return arrayResult;
     }
 
@@ -58,6 +69,15 @@
 
   FreeScroll.prototype = {
     options: {},
+
+    finished: false,
+
+    finish: function(reason){
+      this.removeEvent('scroll', infinity);
+      this.off(EVENT_TO_INFINITY);
+      this.finished = true;
+      console.log(reason);
+    },
 
     on: function(eventId, fn){
       if(!eventsCache[FreeScroll._genEventId(this.options.selector, eventId)]){
@@ -68,7 +88,9 @@
     },
 
     off: function(eventId){
-
+      if(eventsCache[FreeScroll._genEventId(this.options.selector, eventId)]){
+        delete eventsCache[FreeScroll._genEventId(this.options.selector, eventId)];
+      }
     },
 
     addEvent: function(type, fn) {

@@ -7,6 +7,7 @@ concat = require('gulp-concat'),
 del = require('del'),
 jshint = require('gulp-jshint'),
 stylish = require('jshint-stylish'),
+nodemon = require('gulp-nodemon'),
 karma = require('karma').server;
 
 var DEST = 'build/',
@@ -41,4 +42,11 @@ gulp.task('build', ['test', 'clean'], function() {
     .pipe(uglify())
     .pipe(concat('free-scroll.min.js'))
     .pipe(gulp.dest(DEST));
+});
+
+gulp.task('nodeserver', function () {
+  nodemon({ script: 'server.js', ext: 'html js' })
+    .on('restart', function () {
+      console.log('restarted!')
+    });
 });

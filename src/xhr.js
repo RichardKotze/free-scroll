@@ -14,18 +14,31 @@
     return [result, req];
   };
 
-  return function (url) {
+  if (!String.prototype.format) {
+    String.prototype.format = function() {
+      var args = arguments;
+      return this.replace(/{(\d+)}/g, function(match, number) { 
+        return typeof args[number] != 'undefined'
+          ? args[number]
+          : match
+        ;
+      });
+    };
+  }
+
+  return function (requestConfig) {
     var methods = {
       success: function () {},
       error: function () {}
     };
     var XHR = root.XMLHttpRequest || ActiveXObject;
     var request = new XHR('MSXML2.XMLHTTP.3.0');
-    request.open('GET', url, true);
+    request.open('GET', requestConfig.urlFormat.format(requestConfig.pageNumber, requestConfig.pageSize));
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         if (request.status === 200) {
+          requestConfig.pageNumber += 1;
           methods.success.apply(methods, parse(request));
         } else {
           methods.error.apply(methods, parse(request));

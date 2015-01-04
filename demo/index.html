@@ -34,15 +34,28 @@
 	});
 
 	var groupCount = 1;
-	var fs2 = FS({selector:'#requestData', distance: 70, requestDataUrl: '/api/listing' });
+	var fs2 = FS({
+		selector:'#requestData', 
+		distance: 70, 
+		requestData: {
+			urlFormat: '/api/listing?page_number={0}&page_size={1}',
+			pageNumber: 1,
+			pageSize: 10
+		} 
+	});
+
 	fs2.on('toInfinity', function(el, result) {
-		result.success(function(listing){
+		result.success(function(asortment){
 			el.innerHTML += '<h4>Group: ' + groupCount + '</h4>';
 			groupCount++;
-			for (var i = 0; i < listing.length; i++) {
-				el.innerHTML += '<p>Title: ' + listing[i].title + '<br/>Description: ' + listing[i].description + '</p>';
+			for (var i = 0; i < asortment.yourArrayName.length; i++) {
+				el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
 			};
 		});
+		result.error(function(error){
+			console.log(error);
+		});
+
 	});
 	</script>
 </body>
