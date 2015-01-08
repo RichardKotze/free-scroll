@@ -10,11 +10,11 @@
       selector: null,
       distance: 100,
       requestData: {
-        urlFormat: null,
+        urlFormat: '',
         pageNumber: 1,
         pageSize: 10
       },
-      templateUrl: null
+      templateUrl: ''
     };
   var EVENT_TO_INFINITY = 'toInfinity';
 
@@ -52,7 +52,7 @@
       infinity = function(){
         if(FreeScroll._noMore(this, self.options.distance)){
           var request;
-          if(self.options.requestData.urlFormat !== null && !self.finished){
+          if(self.options.requestData.urlFormat !== '' && !self.finished){
             request = FreeScroll.xhr(self.options.requestData);
             request.error(function(error){
               self.finish(error);
@@ -147,8 +147,10 @@
     var options = {};
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
-        if(userOptions.hasOwnProperty(prop) && defaultOptions[prop] !== userOptions[prop]){
-          options[prop] = userOptions[prop];
+        if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] !== 'object' && defaultOptions[prop] !== userOptions[prop]){
+          options[prop] = userOptions[prop] || defaultOptions[prop];
+        }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
+          options[prop] = FreeScroll._updateOptions(defaultOptions[prop], userOptions[prop]);
         }else{
           options[prop] = defaultOptions[prop];
         }
