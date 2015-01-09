@@ -17,6 +17,13 @@ gulp.task('clean', function(cb) {
   del(['build'], cb);
 });
 
+gulp.task('debug', function (done) {
+  karma.start({
+    configFile: __dirname + '/tests/karma.conf.js',
+    browsers: ['Chrome']
+  }, done);
+});
+
 gulp.task('test', function (done) {
   karma.start({
     configFile: __dirname + '/tests/karma.conf.js',

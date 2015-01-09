@@ -6,11 +6,11 @@ describe('Option mapping', function(){
 	      selector: null,
 	      distance: 100,
 	      requestData: {
-	        urlFormat: '',
+	        urlFormat: null,
 	        pageNumber: 1,
 	        pageSize: 10
 	      },
-	      templateUrl: ''
+	      templateUrl: null
 	    };
     });
 
@@ -20,11 +20,11 @@ describe('Option mapping', function(){
 	      selector: '#selector',
 	      distance: 100,
 	      requestData: {
-	        urlFormat: '',
+	        urlFormat: null,
 	        pageNumber: 1,
 	        pageSize: 10
 	      },
-	      templateUrl: ''
+	      templateUrl: null
 	    };
 
 		expect(actual).toEqual(mergedOptions);
@@ -39,13 +39,37 @@ describe('Option mapping', function(){
 	      selector: '#selectMe',
 	      distance: 120,
 	      requestData: {
-	        urlFormat: '',
+	        urlFormat: null,
 	        pageNumber: 1,
 	        pageSize: 10
 	      },
-	      templateUrl: ''
+	      templateUrl: null
 	    };
 
 	    expect(actual).toEqual(mergedOptions);
 	});
+
+	it('using object option set requestData', function(){
+		var actual = FS._updateOptions(mockDefaults, {
+			selector: '#selectMe',
+			distance: 120,
+			requestData:{
+				urlFormat: 'testUrl',
+				pageSize: 12
+			}
+		});
+		var mergedOptions = {
+	      selector: '#selectMe',
+	      distance: 120,
+	      requestData: {
+	        urlFormat: 'testUrl',
+	        pageNumber: 1,
+	        pageSize: 12
+	      },
+	      templateUrl: null
+	    };
+
+	    expect(actual).toEqual(mergedOptions);
+	});
+
 });

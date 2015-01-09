@@ -10,11 +10,11 @@
       selector: null,
       distance: 100,
       requestData: {
-        urlFormat: '',
+        urlFormat: null,
         pageNumber: 1,
         pageSize: 10
       },
-      templateUrl: ''
+      templateUrl: null
     };
   var EVENT_TO_INFINITY = 'toInfinity';
 
@@ -26,6 +26,10 @@
     for (var i = 0; i < arr.length; i++) {
       fn(i, arr[i]);
     }
+  };
+
+  var toType = function(obj) {
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
   };
 
   var infinity = function(){};
@@ -144,10 +148,10 @@
   };
 
   FreeScroll._updateOptions = function(defaultOptions, userOptions){
-    var options = {};
+    var options = defaultOptions;
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
-        if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] !== 'object' && defaultOptions[prop] !== userOptions[prop]){
+        if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
           options[prop] = userOptions[prop] || defaultOptions[prop];
         }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
           options[prop] = FreeScroll._updateOptions(defaultOptions[prop], userOptions[prop]);
