@@ -1,4 +1,6 @@
-(function (window) {
+(function(root, factory){
+  root.FreeScroll = root.FS = factory(root);
+})(this, function (root) {
   'use strict';
   var document = window.document,
     // helper methods
@@ -56,7 +58,7 @@
       infinity = function(){
         if(FreeScroll._noMore(this, self.options.distance)){
           var request;
-          if(self.options.requestData.urlFormat !== '' && !self.finished){
+          if(self.options.requestData.urlFormat !== null && !self.finished){
             request = FreeScroll.xhr(self.options.requestData);
             request.error(function(error){
               self.finish(error);
@@ -148,7 +150,7 @@
   };
 
   FreeScroll._updateOptions = function(defaultOptions, userOptions){
-    var options = defaultOptions;
+    var options = JSON.parse(JSON.stringify(defaultOptions));//clone object (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
         if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
@@ -171,5 +173,5 @@
 
   FreeScroll.prototype.splice = splice;
 
-  window.FreeScroll = window.FS = FreeScroll;
-}(window));
+  return FreeScroll;
+});
