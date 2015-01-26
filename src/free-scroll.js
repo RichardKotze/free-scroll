@@ -31,7 +31,7 @@
   };
 
   var toType = function(obj) {
-    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
   };
 
   var infinity = function(){};
@@ -59,10 +59,7 @@
         if(FreeScroll._noMore(this, self.options.distance)){
           var request;
           if(self.options.requestData.urlFormat !== null && !self.finished){
-            request = FreeScroll.xhr(self.options.requestData);
-            request.error(function(error){
-              self.finish(error);
-            });
+            request = FreeScroll.xhr(self);
           }
           FreeScroll._fire(EVENT_TO_INFINITY, self, this, request);
         }
@@ -150,7 +147,7 @@
   };
 
   FreeScroll._updateOptions = function(defaultOptions, userOptions){
-    var options = JSON.parse(JSON.stringify(defaultOptions));//clone object (no functions allowed)
+    var options = JSON.parse(JSON.stringify(defaultOptions));//clone defaultOptions (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
         if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){

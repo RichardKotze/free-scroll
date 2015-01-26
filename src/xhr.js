@@ -26,13 +26,17 @@
     };
   }
 
-  return function (requestConfig) {
+  
+
+  return function (context) {
     var methods = {
       success: function () {},
       error: function () {}
-    };
-    var XHR = root.XMLHttpRequest || ActiveXObject;
-    var request = new XHR('MSXML2.XMLHTTP.3.0');
+    },
+    XHR = root.XMLHttpRequest || ActiveXObject,
+    request = new XHR('MSXML2.XMLHTTP.3.0'),
+    requestConfig = context.options.requestData;
+
     request.open('GET', requestConfig.urlFormat.format(requestConfig.pageNumber, requestConfig.pageSize));
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
@@ -42,6 +46,7 @@
           methods.success.apply(methods, parse(request));
         } else {
           methods.error.apply(methods, parse(request));
+          context.finish();
         }
       }
     };

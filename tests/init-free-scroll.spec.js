@@ -34,13 +34,14 @@ describe('Initalise free scroll', function(){
 			});
 			var fs2 = FS({
 				selector:'#some', 
-				distance: 70, 
+				distance: 120, 
 				requestData: {
-					urlFormat: '/api/listing?page_number={0}&page_size={1}',
+					urlFormat: '/api/articles?page_number={0}&page_size={1}',
 					pageNumber: 2
 				} 
 			});
 
+			expect(fs1).not.toEqual(fs2);
 			expect(fs1.options.requestData.pageNumber).not.toBe(fs2.options.requestData.pageNumber);
 			expect(fs1.options.requestData.pageNumber).toBe(1);
 			expect(fs2.options.requestData.pageNumber).toBe(2);
