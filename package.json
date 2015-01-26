@@ -1,6 +1,13 @@
 {
   "name": "FreeScroll",
-  "verison": "0.0.1",
+  "description": "Independent infinite scroll library.",
+  "verison": "0.4.0",
+  "author": "Richard Kotze",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/RichardKotze/free-scroll.git"
+  },
+  "license": "MIT",
   "private": false,
   "dependencies": {},
   "devDependencies": {
