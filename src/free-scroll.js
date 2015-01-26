@@ -50,18 +50,18 @@
       return selector;
     }
 
-    this.options = FreeScroll._updateOptions(defaults, selector);
+    this.options = FreeScroll.updateOptions(defaults, selector);
 
     if (this.options.selector) {
       var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
       self = this;
       infinity = function(){
-        if(FreeScroll._noMore(this, self.options.distance)){
+        if(FreeScroll.noMore(this, self.options.distance)){
           var request;
           if(self.options.requestData.urlFormat !== null && !self.finished){
             request = FreeScroll.xhr(self);
           }
-          FreeScroll._fire(EVENT_TO_INFINITY, self, this, request);
+          FreeScroll.fire(EVENT_TO_INFINITY, self, this, request);
         }
       };
       self.addEvent('scroll', infinity);
@@ -83,16 +83,16 @@
     },
 
     on: function(eventId, fn){
-      if(!eventsCache[FreeScroll._genEventId(this.options.selector, eventId)]){
-        eventsCache[FreeScroll._genEventId(this.options.selector, eventId)] = [fn];
+      if(!eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
+        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)] = [fn];
       }else{
-        eventsCache[FreeScroll._genEventId(this.options.selector, eventId)].push(fn);
+        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)].push(fn);
       }
     },
 
     off: function(eventId){
-      if(eventsCache[FreeScroll._genEventId(this.options.selector, eventId)]){
-        delete eventsCache[FreeScroll._genEventId(this.options.selector, eventId)];
+      if(eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
+        delete eventsCache[FreeScroll.genEventId(this.options.selector, eventId)];
       }
     },
 
@@ -126,34 +126,34 @@
 
   };
 
-  FreeScroll._fire = function(eventId, self){
+  FreeScroll.fire = function(eventId, self){
     var args = [].slice.call(arguments, 2);
 
-    if(!eventsCache[FreeScroll._genEventId(self.options.selector, eventId)]){
-      eventsCache[FreeScroll._genEventId(self.options.selector, eventId)] = [];
+    if(!eventsCache[FreeScroll.genEventId(self.options.selector, eventId)]){
+      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)] = [];
     }
 
-    for (var i = 0, il = eventsCache[FreeScroll._genEventId(self.options.selector, eventId)].length; i < il; i++) {
-      eventsCache[FreeScroll._genEventId(self.options.selector, eventId)][i].apply(null, args);
+    for (var i = 0, il = eventsCache[FreeScroll.genEventId(self.options.selector, eventId)].length; i < il; i++) {
+      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)][i].apply(null, args);
     }
   };
 
-  FreeScroll._noMore = function(el, startFrom){
+  FreeScroll.noMore = function(el, startFrom){
     return el.scrollHeight - (el.scrollTop + startFrom) <= el.clientHeight;
   };
 
-  FreeScroll._genEventId = function(objectId, eventId){
+  FreeScroll.genEventId = function(objectId, eventId){
     return objectId+'_'+eventId;
   };
 
-  FreeScroll._updateOptions = function(defaultOptions, userOptions){
+  FreeScroll.updateOptions = function(defaultOptions, userOptions){
     var options = JSON.parse(JSON.stringify(defaultOptions));//clone defaultOptions (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
         if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
           options[prop] = userOptions[prop] || defaultOptions[prop];
         }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
-          options[prop] = FreeScroll._updateOptions(defaultOptions[prop], userOptions[prop]);
+          options[prop] = FreeScroll.updateOptions(defaultOptions[prop], userOptions[prop]);
         }else{
           options[prop] = defaultOptions[prop];
         }
