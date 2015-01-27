@@ -13,12 +13,12 @@ describe('Initalise free scroll', function(){
 		expect(FS.fn.off).toBeDefined();
 	});
 
-	it('has a protected _fire method', function(){
-		expect(FS._fire).toBeDefined();
+	it('has a protected fire method', function(){
+		expect(FS.fire).toBeDefined();
 	});
 
-	it('has a protected _noMore method', function(){
-		expect(FS._noMore).toBeDefined();
+	it('has a protected noMore method', function(){
+		expect(FS.noMore).toBeDefined();
 	});
 
 });

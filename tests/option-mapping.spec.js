@@ -15,7 +15,7 @@ describe('Option mapping', function(){
     });
 
 	it('using only selector', function(){
-		var actual = FS._updateOptions(mockDefaults, '#selector');
+		var actual = FS.updateOptions(mockDefaults, '#selector');
 		var mergedOptions = {
 	      selector: '#selector',
 	      distance: 100,
@@ -31,7 +31,7 @@ describe('Option mapping', function(){
 	});
 
 	it('using object option setting selector and distance', function(){
-		var actual = FS._updateOptions(mockDefaults, {
+		var actual = FS.updateOptions(mockDefaults, {
 			selector: '#selectMe',
 			distance: 120
 		});
@@ -50,7 +50,7 @@ describe('Option mapping', function(){
 	});
 
 	it('using object option set requestData', function(){
-		var actual = FS._updateOptions(mockDefaults, {
+		var actual = FS.updateOptions(mockDefaults, {
 			selector: '#selectMe',
 			distance: 120,
 			requestData:{

@@ -1,7 +1,6 @@
 (function (root, factory) {
     root.FreeScroll.xhr = root.FS.xhr = factory(root);
 })(this, function (root) {
-
   'use strict';
 
   var parse = function (req) {
@@ -13,20 +12,6 @@
     }
     return [result, req];
   };
-
-  if (!String.prototype.format) {
-    String.prototype.format = function() {
-      var args = arguments;
-      return this.replace(/{(\d+)}/g, function(match, number) { 
-        return typeof args[number] != 'undefined'
-          ? args[number]
-          : match
-        ;
-      });
-    };
-  }
-
-  
 
   return function (context) {
     var methods = {
