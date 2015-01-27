@@ -37,10 +37,11 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter(stylish));
 });
 
-gulp.task('build', ['test', 'clean'], function() {
+gulp.task('build', ['lint', 'test', 'clean'], function() {
   return gulp.src([
       SRC+'free-scroll.js',
-      SRC+'xhr.js'
+      SRC+'xhr.js',
+      SRC+'utils.js'
     ])
     // This will output the non-minified version
     .pipe(concat('free-scroll.js'))
