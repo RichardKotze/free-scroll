@@ -1,6 +1,12 @@
 (function(root, factory){
-  root.FreeScroll = root.FS = factory(root);
-})(this, function (root) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([], factory);
+  } else {
+    // Browser globals (root is window)
+    root.FreeScroll = factory();
+  }
+})(this, function () {
   'use strict';
   var document = window.document,
     // helper methods

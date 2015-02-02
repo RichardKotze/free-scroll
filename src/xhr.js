@@ -1,5 +1,5 @@
 (function (root, factory) {
-    root.FreeScroll.xhr = root.FS.xhr = factory(root);
+    root.FreeScroll.xhr = factory(root);
 })(this, function (root) {
   'use strict';
 

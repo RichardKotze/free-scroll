@@ -15,7 +15,7 @@ describe('Option mapping', function(){
     });
 
 	it('using only selector', function(){
-		var actual = FS.updateOptions(mockDefaults, '#selector');
+		var actual = FreeScroll.updateOptions(mockDefaults, '#selector');
 		var mergedOptions = {
 	      selector: '#selector',
 	      distance: 100,
@@ -31,7 +31,7 @@ describe('Option mapping', function(){
 	});
 
 	it('using object option setting selector and distance', function(){
-		var actual = FS.updateOptions(mockDefaults, {
+		var actual = FreeScroll.updateOptions(mockDefaults, {
 			selector: '#selectMe',
 			distance: 120
 		});
@@ -50,7 +50,7 @@ describe('Option mapping', function(){
 	});
 
 	it('using object option set requestData', function(){
-		var actual = FS.updateOptions(mockDefaults, {
+		var actual = FreeScroll.updateOptions(mockDefaults, {
 			selector: '#selectMe',
 			distance: 120,
 			requestData:{
@@ -75,7 +75,7 @@ describe('Option mapping', function(){
 	describe('set options for two new free scroll items', function(){
 
 		it('the options should be different', function(){
-			var fs1 = FS({
+			var fs1 = FreeScroll({
 				selector:'#none', 
 				distance: 70, 
 				requestData: {
@@ -83,7 +83,7 @@ describe('Option mapping', function(){
 					pageNumber: 1
 				} 
 			});
-			var fs2 = FS({
+			var fs2 = FreeScroll({
 				selector:'#some', 
 				distance: 120, 
 				requestData: {
