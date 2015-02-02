@@ -20,4 +20,8 @@ describe('Initalise free scroll', function(){
 		expect(FreeScroll.noMore).toBeDefined();
 	});
 
+	it('has a helpers class', function(){
+		expect(FreeScroll.helpers).toBeDefined();
+	});
+
 });

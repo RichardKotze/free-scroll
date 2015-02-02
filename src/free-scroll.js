@@ -12,7 +12,7 @@
     // helper methods
     push = [].push,
     slice = [].slice,
-    splice = [].splice,
+    helper = {},
     eventsCache = {},
     defaults = {
       selector: null,
@@ -36,13 +36,10 @@
     }
   };
 
-  var toType = function(obj) {
-    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
-  };
-
   var infinity = function(){};
 
   function FreeScroll(selector) {
+    helper = FreeScroll.helpers;
 
     if (!isFreeScroll(this)) {
       return new FreeScroll(selector);
@@ -156,7 +153,7 @@
     var options = JSON.parse(JSON.stringify(defaultOptions));//clone defaultOptions (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
-        if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
+        if(defaultOptions.hasOwnProperty(prop) && helper.typeOf(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
           options[prop] = userOptions[prop] || defaultOptions[prop];
         }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
           options[prop] = FreeScroll.updateOptions(defaultOptions[prop], userOptions[prop]);
@@ -173,8 +170,6 @@
   };
 
   FreeScroll.fn = FreeScroll.prototype;
-
-  FreeScroll.prototype.splice = splice;
 
   return FreeScroll;
 });
