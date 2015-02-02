@@ -29,13 +29,13 @@
 	<script type="text/javascript">
 	//free scroll library
 	
-	var fs1 = FS('#ScrollContainer');
+	var fs1 = FreeScroll('#ScrollContainer');
 	fs1.on('toInfinity', function (el) {
 		el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
 	});
 
 	var groupCount = 1;
-	var fs2 = FS({
+	var fs2 = FreeScroll({
 		selector:'#requestData', 
 		distance: 70, 
 		requestData: {
