@@ -1,8 +1,6 @@
 (function (root, factory) {
-  if(typeof root.FreeScroll !== 'undefined'){
-    root.FreeScroll.xhr = factory(root);
-  }
-})(this, function (root) {
+    root.xhr = factory();
+})(FreeScroll || {}, function () {
   'use strict';
 
   var parse = function (req) {
@@ -20,7 +18,7 @@
       success: function () {},
       error: function () {}
     },
-    XHR = root.XMLHttpRequest || ActiveXObject,
+    XHR = XMLHttpRequest || ActiveXObject,
     request = new XHR('MSXML2.XMLHTTP.3.0'),
     requestConfig = context.options.requestData;
 

@@ -12,7 +12,6 @@
     // helper methods
     push = [].push,
     slice = [].slice,
-    helper = {},
     eventsCache = {},
     defaults = {
       selector: null,
@@ -39,7 +38,6 @@
   var infinity = function(){};
 
   function FreeScroll(selector) {
-    helper = FreeScroll.helpers;
 
     if (!isFreeScroll(this)) {
       return new FreeScroll(selector);
@@ -153,9 +151,9 @@
     var options = JSON.parse(JSON.stringify(defaultOptions));//clone defaultOptions (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
-        if(defaultOptions.hasOwnProperty(prop) && helper.typeOf(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
+        if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
           options[prop] = userOptions[prop] || defaultOptions[prop];
-        }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
+        }else if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) === 'object'){
           options[prop] = FreeScroll.updateOptions(defaultOptions[prop], userOptions[prop]);
         }else{
           options[prop] = defaultOptions[prop];

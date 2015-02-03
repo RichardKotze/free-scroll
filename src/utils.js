@@ -8,14 +8,12 @@ if (!String.prototype.format) {
 }
 
 (function(root, factory){
-    if(typeof root.FreeScroll !== 'undefined'){
-        root.FreeScroll.helpers = factory();
-    }
-})(this, function () {
-	var helpers = {};
-	helpers.typeOf = function(obj) {
+    root.helper = factory();
+})(FreeScroll || {}, function () {
+	var helper = {};
+	helper.typeOf = function(obj) {
 		return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 	};
 
-	return helpers;
+	return helper;
 });
