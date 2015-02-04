@@ -3,16 +3,6 @@
 })(FreeScroll || {}, function () {
   'use strict';
 
-  var parse = function (req) {
-    var result;
-    try {
-      result = JSON.parse(req.responseText);
-    } catch (e) {
-      result = req.responseText;
-    }
-    return [result, req];
-  };
-
   return function (context) {
     var methods = {
       success: function () {},
@@ -28,9 +18,9 @@
       if (request.readyState === 4) {
         if (request.status === 200) {
           requestConfig.pageNumber += 1;
-          methods.success.apply(methods, parse(request));
+          methods.success.apply(methods, FreeScroll.parseJSON(request));
         } else {
-          methods.error.apply(methods, parse(request));
+          methods.error.apply(methods, FreeScroll.parseJSON(request));
           context.finish();
         }
       }

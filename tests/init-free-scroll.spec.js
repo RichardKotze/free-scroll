@@ -28,4 +28,8 @@ describe('Initalise free scroll', function(){
 		expect(FreeScroll.xhr).toBeDefined();
 	});
 
+	it('has a helper class with parseJSON method', function(){
+		expect(FreeScroll.helper.parseJSON).toBeDefined();
+	});
+
 });
