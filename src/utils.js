@@ -10,8 +10,9 @@ if (!String.prototype.format) {
 (function(root, factory){
     root.helper = factory();
 })(FreeScroll || {}, function () {
+	'use strict';
 	var helper = {
-		typeOf = function(obj) {
+		typeOf : function(obj) {
 			return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 		},
 		parseJSON : function (req) {
