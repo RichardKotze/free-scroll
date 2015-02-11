@@ -1,4 +1,4 @@
-(function(root, factory){
+;(function(root, factory){
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define([], factory);
@@ -23,7 +23,8 @@
       },
       templateUrl: null
     };
-  var EVENT_TO_INFINITY = 'toInfinity';
+  var EVENT_TO_INFINITY = 'to-infinity',
+  EVENT_START = 'start';
 
   var isFreeScroll = function(obj){
     return obj instanceof FreeScroll;
@@ -54,19 +55,31 @@
     this.options = FreeScroll.updateOptions(defaults, selector);
 
     if (this.options.selector) {
-      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
-      self = this;
-      infinity = function(){
-        if(FreeScroll.noMore(this, self.options.distance)){
-          var request;
-          if(self.options.requestData.urlFormat !== null && !self.finished){
-            request = FreeScroll.xhr(self);
+      var elementList = document.querySelectorAll(this.options.selector);
+      if(FreeScroll.helper.typeOf(elementList) === 'nodelist' && elementList.length > 0){
+        var arrayResult = push.apply(this, slice.call(elementList)),
+        self = this;
+        infinity = function(){
+          var el = this;
+          if(FreeScroll.noMore(el, self.options.distance)){
+            var request;
+            if(self.options.requestData.urlFormat !== null && !self.finished){
+              request = FreeScroll.xhr(self);
+            }
+            FreeScroll.fire(EVENT_TO_INFINITY, self, el, request);
           }
-          FreeScroll.fire(EVENT_TO_INFINITY, self, this, request);
-        }
-      };
-      self.addEvent('scroll', infinity);
-      return arrayResult;
+        };
+        self.addEvent('scroll', infinity);
+
+        FreeScroll.helper.ready(function(){
+          infinity.call(self[0]);
+        });
+
+        return arrayResult;
+      }else{
+        new Error('Element(s) not found');
+      }
+      return;
     }
 
   }
@@ -128,7 +141,7 @@
   };
 
   FreeScroll.fire = function(eventId, self){
-    var args = [].slice.call(arguments, 2);
+    var args = slice.call(arguments, 2);
 
     if(!eventsCache[FreeScroll.genEventId(self.options.selector, eventId)]){
       eventsCache[FreeScroll.genEventId(self.options.selector, eventId)] = [];
@@ -152,7 +165,7 @@
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
         if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
-          options[prop] = userOptions[prop] || defaultOptions[prop];
+          options[prop] = userOptions[prop] !== null && FreeScroll.helper.typeOf(userOptions[prop]) !== 'undefined' ? userOptions[prop] : defaultOptions[prop];
         }else if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) === 'object'){
           options[prop] = FreeScroll.updateOptions(defaultOptions[prop], userOptions[prop]);
         }else{

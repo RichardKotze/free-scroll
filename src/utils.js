@@ -2,7 +2,7 @@ if (!String.prototype.format) {
 	String.prototype.format = function() {
 	  var args = arguments;
 	  return this.replace(/{(\d+)}/g, function(match, number) { 
-	    return typeof args[number] != 'undefined' ? args[number] : match;
+	    return typeof args[number] !== 'undefined' ? args[number] : match;
 	  });
 	};
 }
@@ -13,7 +13,18 @@ if (!String.prototype.format) {
 	'use strict';
 	var helper = {
 		typeOf : function(obj) {
-			return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+			var type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+
+			// PHANTOMJS bug
+			if ('domwindow' === type) {
+				if ('object' === typeof obj) {
+			    	type = 'null';
+			    } else if ('undefined' === typeof obj) {
+			    	type = 'undefined';
+			    }
+			}
+
+			return type;
 		},
 		parseJSON : function (req) {
 		    var result;
@@ -23,7 +34,16 @@ if (!String.prototype.format) {
 		      result = req.responseText;
 		    }
 		    return [result, req];
-		}
+		},
+		ready: function (fn) {
+	      if (/complete/.test(document.readyState)) {
+	        fn();
+	      } else {
+	        document.addEventListener('DOMContentLoaded', function () {
+	          fn();
+	        }, false);
+	      }
+	    }
 	};
 
 	return helper;

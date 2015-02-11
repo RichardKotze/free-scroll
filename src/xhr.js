@@ -8,6 +8,7 @@
       success: function () {},
       error: function () {}
     },
+    helper = FreeScroll.helper,
     XHR = XMLHttpRequest || ActiveXObject,
     request = new XHR('MSXML2.XMLHTTP.3.0'),
     requestConfig = context.options.requestData;
@@ -18,9 +19,9 @@
       if (request.readyState === 4) {
         if (request.status === 200) {
           requestConfig.pageNumber += 1;
-          methods.success.apply(methods, FreeScroll.parseJSON(request));
+          methods.success.apply(methods, helper.parseJSON(request));
         } else {
-          methods.error.apply(methods, FreeScroll.parseJSON(request));
+          methods.error.apply(methods, helper.parseJSON(request));
           context.finish();
         }
       }

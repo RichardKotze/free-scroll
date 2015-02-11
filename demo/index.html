@@ -9,7 +9,7 @@
 			float: left;
 			margin-right: 10px;
 		}
-		#ScrollContainer, #requestData {
+		#ScrollContainer, #requestData, #requestEmptyStart {
 			height: 200px;
 			width: 300px;
 			border:1px solid #000;
@@ -26,25 +26,56 @@
 		<p>listing placeholder</p> <p>listing placeholder</p> <p>listing placeholder</p> <p>listing placeholder</p>
 		<p>listing placeholder</p> <p>listing placeholder</p> <p>listing placeholder</p> <p>listing placeholder</p>
 	</div>
+	<div id="requestEmptyStart" class="freeScrollContainers">
+		
+	</div>
 	<script type="text/javascript">
 	//free scroll library
 	
+	//*** DEMO 1 ***//
 	var fs1 = FreeScroll('#ScrollContainer');
-	fs1.on('toInfinity', function (el) {
+	fs1.on('to-infinity', function (el) {
 		el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
 	});
 
+	//*** DEMO 2 ***//
 	var groupCount = 1;
 	var fs2 = FreeScroll({
 		selector:'#requestData', 
 		distance: 70, 
 		requestData: {
 			urlFormat: '/api/listing?page_number={0}&page_size={1}',
-			pageNumber: 1
+			pageNumber: 0
 		} 
 	});
 
-	fs2.on('toInfinity', function(el, result) {
+	fs2.on('to-infinity', function(el, result) {
+		result.success(function(asortment){
+			el.innerHTML += '<h4>Group: ' + groupCount + '</h4>';
+			groupCount++;
+			for (var i = 0; i < asortment.yourArrayName.length; i++) {
+				el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
+			};
+		});
+		result.error(function(error){
+			console.log(error);
+		});
+
+	});
+
+	//*** DEMO 3 ***//
+
+	var fs3 = FreeScroll({
+		selector:'#requestEmptyStart', 
+		distance: 70, 
+		requestData: {
+			urlFormat: '/api/listing?page_number={0}&page_size={1}',
+			pageNumber: 0,
+			pageSize: 3
+		} 
+	});
+
+	fs3.on('to-infinity', function(el, result) {
 		result.success(function(asortment){
 			el.innerHTML += '<h4>Group: ' + groupCount + '</h4>';
 			groupCount++;

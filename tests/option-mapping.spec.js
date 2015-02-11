@@ -72,6 +72,30 @@ describe('Option mapping', function(){
 	    expect(actual).toEqual(mergedOptions);
 	});
 
+	it('set requestData pageNumber to 0', function(){
+		var actual = FreeScroll.updateOptions(mockDefaults, {
+			selector: '#selectMe',
+			distance: 120,
+			requestData:{
+				urlFormat: 'testUrl',
+				pageNumber: 0,
+				pageSize: 12
+			}
+		});
+		var mergedOptions = {
+	      selector: '#selectMe',
+	      distance: 120,
+	      requestData: {
+	        urlFormat: 'testUrl',
+	        pageNumber: 0,
+	        pageSize: 12
+	      },
+	      templateUrl: null
+	    };
+
+	    expect(actual).toEqual(mergedOptions);
+	});
+
 	describe('set options for two new free scroll items', function(){
 
 		it('the options should be different', function(){
