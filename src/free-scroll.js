@@ -19,7 +19,8 @@
       requestData: {
         urlFormat: null,
         pageNumber: 1,
-        pageSize: 10
+        pageSize: 10,
+        maxItems: -1
       },
       templateUrl: null
     };

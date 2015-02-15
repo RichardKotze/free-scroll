@@ -2,6 +2,7 @@
     root.xhr = factory();
 })(FreeScroll || {}, function () {
   'use strict';
+  FreeScroll.fn.requestCount = 0;
 
   return function (context) {
     var methods = {
@@ -12,17 +13,21 @@
     XHR = XMLHttpRequest || ActiveXObject,
     request = new XHR('MSXML2.XMLHTTP.3.0'),
     requestConfig = context.options.requestData;
+    context.requestCount += 1;
 
     request.open('GET', requestConfig.urlFormat.format(requestConfig.pageNumber, requestConfig.pageSize));
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         if (request.status === 200) {
-          requestConfig.pageNumber += 1;
+          if(requestConfig.maxItems > -1 && requestConfig.maxItems <= (context.requestCount * requestConfig.pageSize)){
+            context.finish('Reached maxItems to show');
+          }
           methods.success.apply(methods, helper.parseJSON(request));
+          requestConfig.pageNumber += 1;
         } else {
           methods.error.apply(methods, helper.parseJSON(request));
-          context.finish();
+          context.finish('Errored: status code = ' + request.status);
         }
       }
     };
