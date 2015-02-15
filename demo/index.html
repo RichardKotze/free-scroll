@@ -39,7 +39,6 @@
 	});
 
 	//*** DEMO 2 ***//
-	var groupCount = 1;
 	var fs2 = FreeScroll({
 		selector:'#requestData', 
 		distance: 70, 
@@ -51,8 +50,7 @@
 
 	fs2.on('to-infinity', function(el, result) {
 		result.success(function(asortment){
-			el.innerHTML += '<h4>Group: ' + groupCount + '</h4>';
-			groupCount++;
+			el.innerHTML += '<h4>Page: ' + asortment.pageNumber + '</h4>';
 			for (var i = 0; i < asortment.yourArrayName.length; i++) {
 				el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
 			};
@@ -77,8 +75,7 @@
 
 	fs3.on('to-infinity', function(el, result) {
 		result.success(function(asortment){
-			el.innerHTML += '<h4>Group: ' + groupCount + '</h4>';
-			groupCount++;
+			el.innerHTML += '<h4>Page: ' + asortment.pageNumber + '</h4>';
 			for (var i = 0; i < asortment.yourArrayName.length; i++) {
 				el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
 			};
