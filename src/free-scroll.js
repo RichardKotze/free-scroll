@@ -9,10 +9,8 @@
 })(this, function () {
   'use strict';
   var document = window.document,
-    // helper methods
     push = [].push,
     slice = [].slice,
-    instanceEventRefCache = {},
     defaults = {
       selector: null,
       distance: 100,
@@ -24,8 +22,8 @@
       },
       templateUrl: null
     },
-    instanceIds = [];
-  var EVENT_TO_INFINITY = 'to-infinity';
+    instanceIds = [], 
+    instanceEventRef = {};
 
   var uniqueId = function(){
     var prefix = 'freeScroll',
@@ -38,7 +36,7 @@
     return obj instanceof FreeScroll;
   };
 
-  var promises = function(){
+  var Promises = function(){
     this.more = function(){};
   };
 
@@ -49,7 +47,6 @@
   };
 
   var infinity = function(){};
-  var instanceEventRef = {};
 
   function FreeScroll(selector) {
 
@@ -66,29 +63,28 @@
     }
 
     this.options = FreeScroll.updateOptions(defaults, selector);
-    this.promise = new promises();
+    this.promise = new Promises();
     this.instanceId = uniqueId();
 
     if (this.options.selector) {
       var elementList = document.querySelectorAll(this.options.selector);
       if(FreeScroll.helper.typeOf(elementList) === 'nodelist' && elementList.length > 0){
         var arrayResult = push.apply(this, slice.call(elementList)),
-        self = this;
+        $this = this;
         infinity = function(){
           var el = this;
-          if(FreeScroll.noMore(el, self.options.distance)){
+          if(FreeScroll.noMore(el, $this.options.distance)){
             var request;
-            if(self.options.requestData.urlFormat !== null && !self.finished){
-              request = FreeScroll.xhr(self);
+            if($this.options.requestData.urlFormat !== null && !$this.finished){
+              request = FreeScroll.xhr($this);
             }
-            // FreeScroll.fire(EVENT_TO_INFINITY, self, el, request);
-            self.promise.more.call(self, el, request);
+            $this.promise.more.call($this, el, request);
           }
         };
-        self.addEvent('scroll', infinity);
+        $this.addEvent('scroll', infinity);
 
         FreeScroll.helper.ready(function(){
-          infinity.call(self[0]);
+          infinity.call($this[0]);
         });
 
         return arrayResult;
@@ -107,27 +103,12 @@
 
     finish: function(reason){
       this.removeEvent('scroll', infinity);
-      //this.off(EVENT_TO_INFINITY);
       this.finished = true;
       console.log(reason);
     },
 
     more: function(fn){
       this.promise.more = fn;
-    },
-
-    on: function(eventId, fn){
-      if(!eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
-        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)] = [fn];
-      }else{
-        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)].push(fn);
-      }
-    },
-
-    off: function(eventId){
-      if(eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
-        delete eventsCache[FreeScroll.genEventId(this.options.selector, eventId)];
-      }
     },
 
     addEvent: function(type, fn) {
@@ -161,22 +142,10 @@
     },
 
     each: function(fn) {
-      var self = this;
-      forEach(self, fn);
+      var $this = this;
+      forEach($this, fn);
     }
 
-  };
-
-  FreeScroll.fire = function(eventId, self){
-    var args = slice.call(arguments, 2);
-
-    if(!eventsCache[FreeScroll.genEventId(self.options.selector, eventId)]){
-      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)] = [];
-    }
-
-    for (var i = 0, il = eventsCache[FreeScroll.genEventId(self.options.selector, eventId)].length; i < il; i++) {
-      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)][i].apply(null, args);
-    }
   };
 
   FreeScroll.noMore = function(el, startFrom){

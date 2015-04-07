@@ -34,9 +34,6 @@
 	
 	//*** DEMO 1 ***//
 	var fs1 = FreeScroll('#ScrollContainer');
-	// fs1.on('to-infinity', function (el) {
-	// 	el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
-	// });
 	fs1.more(function (el) {
 		el.innerHTML += 'div<br/> div<br/> div<br/> div<br/> div<br/> ';
 	});
@@ -51,19 +48,6 @@
 			maxItems: 26
 		} 
 	});
-
-	// fs2.on('to-infinity', function(el, result) {
-	// 	result.success(function(asortment){
-	// 		el.innerHTML += '<h4>Page: ' + asortment.pageNumber + '</h4>';
-	// 		for (var i = 0; i < asortment.yourArrayName.length; i++) {
-	// 			el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
-	// 		};
-	// 	});
-	// 	result.error(function(error){
-	// 		console.log(error);
-	// 	});
-
-	// });
 
 	fs2.more(function(el, result) {
 		result.success(function(asortment){
@@ -89,19 +73,6 @@
 			pageSize: 3
 		} 
 	});
-
-	// fs3.on('to-infinity', function(el, result) {
-	// 	result.success(function(asortment){
-	// 		el.innerHTML += '<h4>Page: ' + asortment.pageNumber + '</h4>';
-	// 		for (var i = 0; i < asortment.yourArrayName.length; i++) {
-	// 			el.innerHTML += '<p>Title: ' + asortment.yourArrayName[i].title + '<br/>Description: ' + asortment.yourArrayName[i].description + '</p>';
-	// 		};
-	// 	});
-	// 	result.error(function(error){
-	// 		console.log(error);
-	// 	});
-
-	// });
 
 	fs3.more(function(el, result) {
 		result.success(function(asortment){
