@@ -1,37 +1,49 @@
-(function(root, factory){
-  root.FreeScroll = root.FS = factory(root);
-})(this, function (root) {
+;(function(root, factory){
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([], factory);
+  } else {
+    // Browser globals (root is window)
+    root.FreeScroll = factory();
+  }
+})(this, function () {
   'use strict';
   var document = window.document,
-    // helper methods
     push = [].push,
     slice = [].slice,
-    splice = [].splice,
-    eventsCache = {},
     defaults = {
       selector: null,
       distance: 100,
       requestData: {
         urlFormat: null,
         pageNumber: 1,
-        pageSize: 10
+        pageSize: 10,
+        maxItems: -1
       },
       templateUrl: null
-    };
-  var EVENT_TO_INFINITY = 'toInfinity';
+    },
+    instanceIds = [], 
+    instanceEventRef = {};
+
+  var uniqueId = function(){
+    var prefix = 'freeScroll',
+    newInstanceId = prefix + '_' + (instanceIds.length + 1);
+    instanceIds.push(newInstanceId);
+    return newInstanceId;
+  };
 
   var isFreeScroll = function(obj){
     return obj instanceof FreeScroll;
+  };
+
+  var Promises = function(){
+    this.more = function(){};
   };
 
   var forEach = function(arr, fn){
     for (var i = 0; i < arr.length; i++) {
       fn(i, arr[i]);
     }
-  };
-
-  var toType = function(obj) {
-    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
   };
 
   var infinity = function(){};
@@ -51,21 +63,35 @@
     }
 
     this.options = FreeScroll.updateOptions(defaults, selector);
+    this.promise = new Promises();
+    this.instanceId = uniqueId();
 
     if (this.options.selector) {
-      var arrayResult = push.apply(this, slice.call(document.querySelectorAll(this.options.selector))),
-      self = this;
-      infinity = function(){
-        if(FreeScroll.noMore(this, self.options.distance)){
-          var request;
-          if(self.options.requestData.urlFormat !== null && !self.finished){
-            request = FreeScroll.xhr(self);
+      var elementList = document.querySelectorAll(this.options.selector);
+      if(FreeScroll.helper.typeOf(elementList) === 'nodelist' && elementList.length > 0){
+        var arrayResult = push.apply(this, slice.call(elementList)),
+        $this = this;
+        infinity = function(){
+          var el = this;
+          if(FreeScroll.noMore(el, $this.options.distance)){
+            var request;
+            if($this.options.requestData.urlFormat !== null && !$this.finished){
+              request = FreeScroll.xhr($this);
+            }
+            $this.promise.more.call($this, el, request);
           }
-          FreeScroll.fire(EVENT_TO_INFINITY, self, this, request);
-        }
-      };
-      self.addEvent('scroll', infinity);
-      return arrayResult;
+        };
+        $this.addEvent('scroll', infinity);
+
+        FreeScroll.helper.ready(function(){
+          infinity.call($this[0]);
+        });
+
+        return arrayResult;
+      }else{
+        new Error('Element(s) not found');
+      }
+      return;
     }
 
   }
@@ -77,65 +103,49 @@
 
     finish: function(reason){
       this.removeEvent('scroll', infinity);
-      this.off(EVENT_TO_INFINITY);
       this.finished = true;
       console.log(reason);
     },
 
-    on: function(eventId, fn){
-      if(!eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
-        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)] = [fn];
-      }else{
-        eventsCache[FreeScroll.genEventId(this.options.selector, eventId)].push(fn);
-      }
-    },
-
-    off: function(eventId){
-      if(eventsCache[FreeScroll.genEventId(this.options.selector, eventId)]){
-        delete eventsCache[FreeScroll.genEventId(this.options.selector, eventId)];
-      }
+    more: function(fn){
+      this.promise.more = fn;
     },
 
     addEvent: function(type, fn) {
-      this.each(function(index, el){
+      var $this = this;
+      instanceEventRef[$this.instanceId] = fn;
+      $this.each(function(index, el){
         if (el.attachEvent) {
-          el['e'+type+fn] = fn;
-          el[type+fn] = function(){
-            el['e'+type+fn](window.event);
+          el['e'+type+instanceEventRef[$this.instanceId]] = instanceEventRef[$this.instanceId];
+          el[type+instanceEventRef[$this.instanceId]] = function(){
+            el['e'+type+instanceEventRef[$this.instanceId]](window.event);
           };
-          el.attachEvent('on'+type, el[type+fn]);
-        } else
-          el.addEventListener(type, fn, false);
+          el.attachEvent('on'+type, el[type+instanceEventRef[$this.instanceId]]);
+        }else{
+          el.addEventListener(type, instanceEventRef[$this.instanceId], false);
+        }
       });
     },
 
     removeEvent: function(type, fn) {
-      this.each(function(index, el){
+      var $this = this;
+      $this.each(function(index, el){
          if (el.detachEvent) {
-          el.detachEvent('on'+type, el[type+fn]);
-          el[type+fn] = null;
-        } else
-          el.removeEventListener(type, fn, false);
+          el.detachEvent('on'+type, el[type+instanceEventRef[$this.instanceId]]);
+          el[type+instanceEventRef[$this.instanceId]] = null;
+        }else{
+          el.removeEventListener(type, instanceEventRef[$this.instanceId], false);
+        }
       });
+
+      delete instanceEventRef[$this.instanceId];
     },
 
     each: function(fn) {
-      var self = this;
-      forEach(self, fn);
+      var $this = this;
+      forEach($this, fn);
     }
 
-  };
-
-  FreeScroll.fire = function(eventId, self){
-    var args = [].slice.call(arguments, 2);
-
-    if(!eventsCache[FreeScroll.genEventId(self.options.selector, eventId)]){
-      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)] = [];
-    }
-
-    for (var i = 0, il = eventsCache[FreeScroll.genEventId(self.options.selector, eventId)].length; i < il; i++) {
-      eventsCache[FreeScroll.genEventId(self.options.selector, eventId)][i].apply(null, args);
-    }
   };
 
   FreeScroll.noMore = function(el, startFrom){
@@ -150,9 +160,9 @@
     var options = JSON.parse(JSON.stringify(defaultOptions));//clone defaultOptions (no functions allowed)
     if(typeof userOptions === 'object'){
       for(var prop in defaultOptions){
-        if(defaultOptions.hasOwnProperty(prop) && toType(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
-          options[prop] = userOptions[prop] || defaultOptions[prop];
-        }else if(defaultOptions.hasOwnProperty(prop) && typeof defaultOptions[prop] === 'object'){
+        if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) !== 'object' && defaultOptions[prop] !== userOptions[prop]){
+          options[prop] = userOptions[prop] !== null && FreeScroll.helper.typeOf(userOptions[prop]) !== 'undefined' ? userOptions[prop] : defaultOptions[prop];
+        }else if(defaultOptions.hasOwnProperty(prop) && FreeScroll.helper.typeOf(defaultOptions[prop]) === 'object'){
           options[prop] = FreeScroll.updateOptions(defaultOptions[prop], userOptions[prop]);
         }else{
           options[prop] = defaultOptions[prop];
@@ -168,45 +178,39 @@
 
   FreeScroll.fn = FreeScroll.prototype;
 
-  FreeScroll.prototype.splice = splice;
-
   return FreeScroll;
 });
 
 (function (root, factory) {
-    root.FreeScroll.xhr = root.FS.xhr = factory(root);
-})(this, function (root) {
+    root.xhr = factory();
+})(FreeScroll || {}, function () {
   'use strict';
-
-  var parse = function (req) {
-    var result;
-    try {
-      result = JSON.parse(req.responseText);
-    } catch (e) {
-      result = req.responseText;
-    }
-    return [result, req];
-  };
+  FreeScroll.fn.requestCount = 0;
 
   return function (context) {
     var methods = {
       success: function () {},
       error: function () {}
     },
-    XHR = root.XMLHttpRequest || ActiveXObject,
+    helper = FreeScroll.helper,
+    XHR = XMLHttpRequest || ActiveXObject,
     request = new XHR('MSXML2.XMLHTTP.3.0'),
     requestConfig = context.options.requestData;
+    context.requestCount += 1;
 
     request.open('GET', requestConfig.urlFormat.format(requestConfig.pageNumber, requestConfig.pageSize));
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         if (request.status === 200) {
+          methods.success.apply(methods, helper.parseJSON(request));
           requestConfig.pageNumber += 1;
-          methods.success.apply(methods, parse(request));
+          if(requestConfig.maxItems > -1 && requestConfig.maxItems <= (context.requestCount * requestConfig.pageSize)){
+            context.finish('Reached maxItems to show');
+          }
         } else {
-          methods.error.apply(methods, parse(request));
-          context.finish();
+          methods.error.apply(methods, helper.parseJSON(request));
+          context.finish('Errored: status code = ' + request.status);
         }
       }
     };
@@ -227,7 +231,49 @@ if (!String.prototype.format) {
 	String.prototype.format = function() {
 	  var args = arguments;
 	  return this.replace(/{(\d+)}/g, function(match, number) { 
-	    return typeof args[number] != 'undefined' ? args[number] : match;
+	    return typeof args[number] !== 'undefined' ? args[number] : match;
 	  });
 	};
 }
+
+(function(root, factory){
+    root.helper = factory();
+})(FreeScroll || {}, function () {
+	'use strict';
+	var helper = {
+		typeOf : function(obj) {
+			var type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+
+			// PHANTOMJS bug
+			if ('domwindow' === type) {
+				if ('object' === typeof obj) {
+			    	type = 'null';
+			    } else if ('undefined' === typeof obj) {
+			    	type = 'undefined';
+			    }
+			}
+
+			return type;
+		},
+		parseJSON : function (req) {
+		    var result;
+		    try {
+		      result = JSON.parse(req.responseText);
+		    } catch (e) {
+		      result = req.responseText;
+		    }
+		    return [result, req];
+		},
+		ready: function (fn) {
+	      if (/complete/.test(document.readyState)) {
+	        fn();
+	      } else {
+	        document.addEventListener('DOMContentLoaded', function () {
+	          fn();
+	        }, false);
+	      }
+	    }
+	};
+
+	return helper;
+});
