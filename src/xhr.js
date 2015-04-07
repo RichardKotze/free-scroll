@@ -20,11 +20,11 @@
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         if (request.status === 200) {
+          methods.success.apply(methods, helper.parseJSON(request));
+          requestConfig.pageNumber += 1;
           if(requestConfig.maxItems > -1 && requestConfig.maxItems <= (context.requestCount * requestConfig.pageSize)){
             context.finish('Reached maxItems to show');
           }
-          methods.success.apply(methods, helper.parseJSON(request));
-          requestConfig.pageNumber += 1;
         } else {
           methods.error.apply(methods, helper.parseJSON(request));
           context.finish('Errored: status code = ' + request.status);
