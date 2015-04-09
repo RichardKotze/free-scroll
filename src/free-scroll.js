@@ -46,7 +46,16 @@
     }
   };
 
-  var infinity = function(){};
+  var infinity = function($this){
+    var el = this;
+    if(FreeScroll.noMore(el, $this.options.distance)){
+      var request;
+      if($this.options.requestData.urlFormat !== null && !$this.finished){
+        request = FreeScroll.xhr($this);
+      }
+      $this.promise.more.call($this, el, request);
+    }
+  };
 
   function FreeScroll(selector) {
 
@@ -71,20 +80,13 @@
       if(FreeScroll.helper.typeOf(elementList) === 'nodelist' && elementList.length > 0){
         var arrayResult = push.apply(this, slice.call(elementList)),
         $this = this;
-        infinity = function(){
-          var el = this;
-          if(FreeScroll.noMore(el, $this.options.distance)){
-            var request;
-            if($this.options.requestData.urlFormat !== null && !$this.finished){
-              request = FreeScroll.xhr($this);
-            }
-            $this.promise.more.call($this, el, request);
-          }
-        };
-        $this.addEvent('scroll', infinity);
+        
+        $this.addEvent('scroll', function(){
+          infinity.call($this[0], $this);
+        });
 
         FreeScroll.helper.ready(function(){
-          infinity.call($this[0]);
+          infinity.call($this[0], $this);
         });
 
         return arrayResult;
@@ -102,7 +104,7 @@
     finished: false,
 
     finish: function(reason){
-      this.removeEvent('scroll', infinity);
+      this.removeEvent('scroll');
       this.finished = true;
       console.log(reason);
     },
@@ -127,7 +129,7 @@
       });
     },
 
-    removeEvent: function(type, fn) {
+    removeEvent: function(type) {
       var $this = this;
       $this.each(function(index, el){
          if (el.detachEvent) {
