@@ -1,4 +1,4 @@
-ddescribe('Initial FreeScroll events', function(){
+describe('Initial FreeScroll events', function(){
 
 	var addEventSpy = jasmine.createSpy('addEvent');
 	var readyEventSpy = jasmine.createSpy('ready');
@@ -8,7 +8,7 @@ ddescribe('Initial FreeScroll events', function(){
 	FreeScroll.noMore = noMoreSpy;
 
 	beforeEach(function(){
-		setFixtures('<div class="className" style="height:30px;"><div style="height:300px;"></div></div>');
+		setFixtures('<div class="className" style="height:100px;overflow:auto;width:100px;"><div style="height:300px;">Testing</div></div>');
 		fs = FreeScroll('.className');//spyOn(fs, 'addEvent');
 	});
 
@@ -20,11 +20,18 @@ ddescribe('Initial FreeScroll events', function(){
 		expect(FreeScroll.helper.ready).toHaveBeenCalledWith(jasmine.any(Function));
 	});
 
-	it('noMore is false when scroll event is fired', function(){
+	xit('noMore is false when scroll event is fired', function(){
 		FreeScroll.noMore.and.returnValue(false);
 		spyOn(fs.promise, 'more');
-		$(fs[0]).trigger('scroll');
-		expect(FreeScroll.noMore).toHaveBeenCalled();
-		expect(fs.promise.more).not.toHaveBeenCalled();
+		$('.className').animate({
+          scrollTop: 80
+        }, 20);
+		//fs[0].scroll();
+		setTimeout(function(){
+			debugger;
+			expect(FreeScroll.noMore).toHaveBeenCalled();
+			expect(fs.promise.more).not.toHaveBeenCalled();
+		}, 50);
+		
 	});
 });
